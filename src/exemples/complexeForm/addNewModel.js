@@ -1,8 +1,7 @@
 export default [
   {
-    name: 'name',
     type: 'groupe',
-    groupeClass: 'cont6',
+    class: 'cont6',
     inputs: [
       {
         label: 'Nom du modèle :',
@@ -19,46 +18,44 @@ export default [
     ]
   },
   {
-    name: 'number',
     type: 'groupe',
-    groupeClass: 'cont6',
+    class: 'cont6',
     inputs: [
       {
         label: 'Poids :',
         name: 'poids',
         placeholder: '5 kg',
-        classes: 'col2'
+        class: 'col2'
       },
       {
         label: 'Puissance :',
         name: 'puissance',
         placeholder: '2,6 kW',
-        classes: 'col2'
+        class: 'col2'
       },
       {
         label: 'Capacité',
         name: 'capacite',
         placeholder: '200 L',
-        classes: 'col2'
+        class: 'col2'
       }
     ]
   },
   {
-    name: 'number',
     type: 'groupe',
-    groupeClass: 'cont6',
+    class: 'cont6',
     inputs: [
       {
         label: 'Dimension :',
         name: 'dimension',
         placeholder: 'L x P x H',
-        classes: 'col4'
+        class: 'col4'
       },
       {
         label: 'Prix :',
         name: 'prix',
         placeholder: '140 €',
-        classes: 'col2'
+        class: 'col2'
       }
     ]
   },
@@ -66,6 +63,17 @@ export default [
     label: 'Description :',
     name: 'info',
     type: 'textarea',
-    classes: 'col4'
+    class: 'col4'
+  },
+  {
+    name: 'testrecursive',
+    forms: [
+      {
+        name: 'prout'
+      },
+      {
+        name: 'fesse'
+      }
+    ]
   }
 ]

@@ -1,17 +1,20 @@
 import modelTable from './addNewModel'
+import tinymce from '@/tinymce'
 
 export default [
   {
-    name: 'col2',
+    name: 'prout',
+    grouped: false,
     type: 'groupe',
     class: 'cont6',
     inputs: [
       {
         label: 'Nom produit :',
         name: 'name',
-        type: 'hidden',
-        class: 'col4'
-        // placeholder: 'Doe'
+        value: 'coucou',
+        // type: 'hidden',
+        class: 'col4',
+        placeholder: 'Doe'
       },
       {
         label: 'Référence :',
@@ -28,9 +31,24 @@ export default [
     class: 'col3'
   },
   {
-    name: 'col2',
+    label: 'Catégories :',
+    name: 'slug',
+    default: 45,
+    class: 'col3',
+    options: {
+      'Cuisson': {
+        45: 'friteuse',
+        46: 'grille'
+      },
+      'Préparation': {
+        48: 'Blender',
+        49: 'Mixeur'
+      }
+    }
+  },
+  {
     type: 'groupe',
-    groupeClass: 'cont6',
+    class: 'cont6',
     inputs: [
       {
         label: 'Poids :',
@@ -53,7 +71,6 @@ export default [
     ]
   },
   {
-    name: 'col2',
     type: 'groupe',
     class: 'cont6',
     inputs: [
@@ -64,8 +81,10 @@ export default [
         class: 'col4'
       },
       {
-        label: 'Prix :',
+        label: 'Prix (€) :',
         name: 'prix',
+        type: 'Number',
+        placeholder: '1000€',
         class: 'col2'
       }
     ]
@@ -73,6 +92,7 @@ export default [
   {
     label: 'Description',
     name: 'info',
+    component: tinymce,
     type: 'tinymce'
   },
   {
@@ -80,31 +100,5 @@ export default [
     name: 'sousproduits',
     btns: ['Supprimer'],
     forms: modelTable
-    //   {
-    //     label: 'Nom du modèle :',
-    //     name: 'name'
-    //   },
-    //   {
-    //     label: 'Référence :',
-    //     name: 'ref'
-    //   },
-    //   {
-    //     label: 'Poids :',
-    //     name: 'poids'
-    //   },
-    //   {
-    //     label: 'Puissance :',
-    //     name: 'puissance'
-    //   },
-    //   {
-    //     label: 'Prix :',
-    //     name: 'prix'
-    //   },
-    //   {
-    //     label: 'Description :',
-    //     name: 'info',
-    //     type: 'textarea'
-    //   }
-    // ]
   }
 ]
