@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <img src="./assets/logo-vue-helper-forms2.png" alt="">
     <router-view></router-view>
   </div>
 </template>

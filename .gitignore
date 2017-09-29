@@ -6,6 +6,7 @@ build/
 
 Vue-Helper-Form.zip
 npm-debug.log*
+package-lock.json
 yarn-debug.log*
 yarn-error.log*
 test/unit/coverage
