@@ -4,27 +4,60 @@
   //   obj()
   // }
   import dispatchRoot from './lib/FormUtils'
+  import { initData, grouped, getName, getType } from './lib/initHelper'
+  import { cloneDeep } from 'lodash'
 
   export default({
     render (h) {
       return dispatchRoot(this, h)
+    },
+    data () {
+      return {
+        localData: {}
+      }
     },
     props: {
       tag: {
         default: 'div',
         type: [String]
       },
-      inputs: {
-        type: [Array, Object]
-      },
       root: {
         default: true,
         type: [Boolean]
+      },
+      cle: {
+        default: false
+      },
+      parent: {
+        default: false
+      },
+      name: {
+        default: false
+      },
+      inputs: {
+        type: [Array, Object]
+      },
+      data: {
+        default: function () {
+          return initData(this)
+        }
       }
+    },
+    created () {
+      this.upLocalData()
     },
     computed: {
     },
     methods: {
+      upLocalData () {
+        this.localData = cloneDeep(this.data)
+      },
+      upInput (key, value) {
+        // console.log(this.localData[key])
+        this.$emit('childUp')
+        console.log(this.name)
+        this.localData[key] = value
+      },
       hasForms (input) {
         return typeof input.forms !== 'undefined'
       },
@@ -52,8 +85,32 @@
           return input.placeholder
         }
       },
-      getName (input) {
-        return input.name
+      grouped (input) {
+        return grouped(input)
+      },
+      getValue (input) {
+        let value = this.data
+        // if (this.name !== false && !this.root) {
+        //   console.log(this.name)
+        //   console.log(value)
+        //   value = value[this.name]
+        // }
+        // if (this.cle !== false && !this.root) {
+        //   console.log(this.getName(input))
+        //   console.log(value)
+        //   value = value[this.cle]
+        // }
+        return value[this.getName(input)]
+      },
+      getNew (input) {
+        if (typeof input.new === 'boolean') {
+          return input.new
+        } else {
+          return true
+        }
+      },
+      getName (input, key = false) {
+        return getName(input, key)
       },
       getLabel (input) {
         if (typeof input.label === 'undefined') {
@@ -63,12 +120,14 @@
         }
       },
       getType (input) {
-        if (typeof input.forms !== 'undefined') {
-          return 'form'
-        } else if (typeof input.type !== 'undefined') {
-          return input.type
-        } else {
-          return 'text'
+        return getType(input)
+      }
+    },
+    watch: {
+      data: {
+        deep: true,
+        handle: function (newVal, oldVal) {
+          console.log(newVal)
         }
       }
     }
