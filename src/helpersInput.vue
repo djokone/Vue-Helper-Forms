@@ -1,5 +1,5 @@
 <script>
-  import { isEmpty } from 'lodash'
+  import { isEmpty, cloneDeep } from 'lodash'
   import inputDispatcher from '@/lib/InputUtils'
   // import tinymce from 'tinymce'
 
@@ -7,18 +7,43 @@
     render (h) {
       return inputDispatcher(this, h)
     },
+    data () {
+      return {
+        primary: this._uid,
+        localData: cloneDeep(this.value)
+      }
+    },
     props: {
       name: {
         type: [String]
       },
+      options: {
+        default: false
+      },
+      value: {
+        required: false,
+        default: ''
+      },
       label: {
         default: this.name
+      },
+      disabled: {
+        default: false
+      },
+      component: {
+        default: false,
+        type: [Object, Boolean]
       },
       type: {
         default: 'text'
       },
       placeholder: {
         default: 'Put your' + this.type + 'here !'
+      }
+    },
+    methods: {
+      upLocal (val) {
+        this.localData = cloneDeep(val)
       }
     },
     computed: {
