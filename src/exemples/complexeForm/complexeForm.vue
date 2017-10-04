@@ -7,6 +7,9 @@
       :inputs="inputs"
       class="test"
       :data="data"
+      @add="add"
+      @updated="update"
+      @input="input"
     >
     </helperForm>
   </div>
@@ -38,6 +41,24 @@
         ],
         newModelInputs: addNewModel,
         inputs: produitEditForm
+      }
+    },
+    created () {
+    },
+    methods: {
+      add (event, data) {
+        console.log(event)
+        console.log(data)
+      },
+      input (key, value, da) {
+        console.log(key)
+        console.log(value)
+        console.log(da)
+      },
+      update (data, newVal, childs) {
+        // console.log(data)
+        // console.log(newVal)
+        // console.log(childs)
       }
     },
     components: {

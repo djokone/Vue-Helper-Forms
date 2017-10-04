@@ -66,6 +66,12 @@ export default [
     class: 'col4'
   },
   {
+    label: 'Ajouter',
+    behavior: 'add',
+    class: ['super'],
+    type: 'btn'
+  },
+  {
     name: 'testrecursive',
     forms: [
       {
@@ -73,7 +79,31 @@ export default [
       },
       {
         name: 'fesse'
+      },
+      {
+        label: 'Ajouter',
+        behavior: 'add',
+        class: ['super'],
+        type: 'btn'
+      },
+      {
+        label: 'Supprimer modèle',
+        behavior: 'del',
+        class: ['super'],
+        type: 'btn'
       }
     ]
+  },
+  {
+    label: 'Supprimer',
+    behavior: ['add'],
+    class: ['del'],
+    type: 'btn'
+  },
+  {
+    label: 'Sauvegarder',
+    behavior: 'edit',
+    class: ['edit'],
+    type: 'btn'
   }
 ]
