@@ -31,8 +31,8 @@ let dispatchProperties = function (obj) {
   let on = {
     input: function (event) {
       // obj.localData = event.target.value
-      obj.upLocal(event.target.value)
       // console.log(event.target.value)
+      obj.upLocal(event.target.value)
       obj.$emit('input', obj.name, event.target.value)
     }
   }

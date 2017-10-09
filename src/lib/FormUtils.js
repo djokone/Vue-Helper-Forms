@@ -1,6 +1,7 @@
 import helpersInput from '@/helpersInput'
 import helpersForm from '@/HelpersForm'
 import { isEmpty, forEach } from 'lodash'
+// import { RdebugChild, RdebugAddForm } from './recursiveDebug'
 
 // Lunch the recursive while in the component object for dispatching
 // Put container to false to get just the childrens
@@ -8,21 +9,8 @@ let dispatchRoot = function (obj, create, input = obj, container = true) {
   let childrens = []
   // When inputs is inject in inputs
   if (typeof input.inputs !== 'undefined') {
-    input.inputs.forEach((inp, key) => {
-      if (dispatch(obj, create, inp)) {
-        childrens.push(dispatch(obj, create, inp))
-      }
-    })
+    childrens = [...generateFormInputs(obj, create, input)]
   }
-  // When gots forms
-  if (typeof input.forms !== 'undefined') {
-    input.forms.forEach((inp, key) => {
-      if (dispatch(obj, create, inp)) {
-        childrens.push(dispatch(obj, create, inp, key))
-      }
-    })
-  }
-
   if (obj.root && container) { //  If is root and need a container, then create the uniq root container
     return createRootContainer(obj, create, createFormContainer(obj, create, childrens))
   } else if (container) { //  If is a recursive root dispatch
@@ -34,49 +22,121 @@ let dispatchRoot = function (obj, create, input = obj, container = true) {
   }
 }
 
-// Lunch the right function in a while
-let dispatch = function (obj, create, input, key = false) {
-  let toReturn
-  if (obj.getType(input) === 'form') {
-    toReturn = createHelperForm(obj, create, input)
-    if (obj.grouped(input)) {
-      let Forms = []
-      if (obj.getNew(input)) {
-        if (obj.parent === key) {
-          // console.log(input)
-          let newForm = createHelperForm(obj, create, input)
-          Forms.push(create('div', {
-            'class': 'add ' + obj.getName(input)
-          }, [newForm]))
-        }
+let generateFormInputs = function (obj, create, input) {
+  let form = []
+  input.inputs.forEach((inputs, key) => { // For each input pass to a form
+    if (obj.getType(inputs) !== 'form') { // After the form is created
+      // Only inputs
+      // During the input generation
+      form.push(dispatch(obj, create, inputs)) // create inputs input
+    } else { // Before the form is created (Parent instance)
+      let childForm = []
+      if (obj.haveNew(inputs)) {
+        // let btn = createBtn(obj, create, inputs)
+        childForm.push(create(
+          'div',
+          {
+            'class': 'multiforms addNew ' + obj.getName(inputs)
+          },
+          [dispatch(obj, create, inputs)]) // Create the form for new
+        )
       }
-      if (obj.getName(input) && !isEmpty(obj.localData[obj.getName(input)])) {
-        forEach(obj.localData[obj.getName(input)], (value, key) => {
-          Forms.push(createHelperForm(obj, create, input, key))
+      // Create multiforms
+      if (obj.localData[obj.getName(inputs)] !== 'undefined' && Array.isArray(obj.localData[obj.getName(inputs)])) {
+        forEach(obj.getValue(inputs), (value, key) => {
+        // Create form for each index in data array
+          let child = []
+          if (typeof inputs.title === 'function') {
+            child.push(createTitle(obj, create, inputs, value, key))
+          }
+          child.push(dispatch(obj, create, inputs, key))
+          let myForm = create('div', {
+            'class': 'multiforms ' + obj.getName(inputs),
+            attrs: {
+              id: obj.getName(inputs) + '-' + key
+            }
+          }, child)
+          childForm.push(myForm) // create child forms
         })
       }
-      // forEach(input.localData[key], (v, k) => {
-      //   Forms.push(createHelperForm(obj, create, input))
-      //   // console.log(v)
-      //   // console.log(k)
-      // })
-      toReturn = create('div', {
-        'class': 'multiforms ' + obj.getName(input)
-      }, Forms)
-      // console.log(toReturn)
+      form.push(create('div', {
+        'class': 'multiform-container ' + obj.getName(inputs)
+      }, childForm))
     }
-  } else if (obj.getType(input) === 'groupe') {
+  })
+  return form
+}
+
+// Lunch the right function in a while
+let dispatch = function (obj, create, input, key = false) {
+  let toReturn = []
+  if (obj.getType(input) === 'form') {
+    toReturn = createHelperForm(obj, create, input, key)
+  } else if (obj.getType(input) === 'groupe' || obj.getType(input) === 'group' || obj.getType(input) === 'wrap') {
     toReturn = createGroupContainer(obj, create, input)
+  } else if (obj.getType(input) === 'btn') {
+    if (obj.getBehaviors(input) !== false) {
+      forEach(obj.getBehaviors(input), (v, k) => {
+        if (v === 'add' && obj.new) {
+          toReturn = createBtn(obj, create, input)
+        }
+        if ((v === 'edit' || v === 'del') && !obj.new) {
+          toReturn = createBtn(obj, create, input)
+        }
+      })
+    }
   } else {
     toReturn = createInput(obj, create, input)
   }
   return toReturn
 }
 
+let createTitle = function (obj, create, input, value = false, key = false) {
+  if (typeof input.title(create, dispatch(obj, create, input, key), value, key) === 'string') {
+    return create('h' + (obj.deep + 2), {
+      DomProps: {
+        innerHTML: input.title(create, dispatch(obj, create, input, key), value, key)
+      }
+    })
+  } else {
+    return input.title(create, dispatch(obj, create, input, key), value, key)
+  }
+}
+
+let createBtn = function (obj, create, input = obj) {
+  let classes = input.class || []
+  let behavior = input.behavior || ''
+  let params = {
+    'class': ['submit', ...[behavior], ...[classes]],
+    domProps: {
+      innerHTML: obj.getLabel(input)
+    }
+  }
+  params.on = []
+  if (behavior) {
+    params.on['click'] = function (event) {
+      obj.beforeUpButton()
+      event.preventDefault()
+      obj.$emit('upButton', event, behavior, obj.localData, obj.name, 0,
+        function (res) {
+          if (!res['success']) {
+            console.log('error')
+          } else {
+            if (obj.new) {
+              obj.resetForm()
+            }
+            console.log('success')
+          }
+        }
+      )
+    }
+  }
+  let btn = create('button', params)
+  return btn
+}
 // create a custom input
 let createInput = function (obj, create, input) {
   if (obj.grouped(input)) {
-    // console.log(obj.getValue(input))
   }
   let props = {
     label: obj.getLabel(input),
@@ -95,7 +155,6 @@ let createInput = function (obj, create, input) {
   let on = {
     input: obj.upInput
   }
-  // console.log(props)
   return create(
     helpersInput,
     {
@@ -110,15 +169,25 @@ let createInput = function (obj, create, input) {
 let createHelperForm = function (obj, create, input, key = false) {
   let props = {}
   let on = {}
+  let isNew = false
+  if (key === false) {
+    isNew = true
+  }
+  let deep = obj.deep + 1
   if (obj.hasForms(input) && obj.getType(input)) {
     props = {
       inputs: input.forms,
       root: false,
-      cle: key,
+      new: isNew,
+      index: key,
+      deep,
       name: input.name,
       hasToBeGrouped: obj.hasToBeGroup(input)
     }
   }
+  // on['input'] = obj.upInput
+  on['upForm'] = obj.upForm
+  on['upButton'] = obj.upButton
   if (!obj.name) {
     props['parent'] = 'root'
   } else {
@@ -143,7 +212,6 @@ let createGroupContainer = function (obj, create, input, childrens) {
   classes.push(classe)
   let getRoot = dispatchRoot(obj, create, input, false)
   if (getRoot) {
-    // console.log(getRoot)
     childrens = getRoot
   }
   return create(

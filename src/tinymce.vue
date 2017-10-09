@@ -1,5 +1,4 @@
-<style link="/tinymce/skins/lightgray/skin.min.css"></style>
-<style link="/tinymce/skins/lightgray/content.min.css" ></style>
+
 <template>
   <div class="mytinymce">
     <textarea v-model="content" :id="'tinymce'+id">
@@ -10,6 +9,8 @@
 <script>
   import tinymce from 'tinymce/tinymce'
   import 'tinymce/themes/modern/theme'
+  import 'tinymce/skins/lightgray/skin.min.css'
+  import 'tinymce/skins/lightgray/content.min.css'
 
   import 'tinymce/plugins/paste/plugin'
   import 'tinymce/plugins/link/plugin'

@@ -40,6 +40,16 @@
         inputs: produitEditForm
       }
     },
+    created () {
+    },
+    methods: {
+      // add (event, data, local) {
+      // },
+      // input (key, value, da) {
+      // },
+      // update (data, newVal, childs) {
+      // }
+    },
     components: {
       helperForm
     }

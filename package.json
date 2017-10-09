@@ -1,9 +1,13 @@
 {
-  "name": "helpers-form",
-  "version": "1.0.0",
-  "description": "Helper for forms",
-  "author": "DjokOne <tim.potter@wanadoo.fr>",
-  "private": true,
+  "name": "vue-helper-forms",
+  "version": "1.0.4",
+  "description": "Helper for vue js to create awsome forms",
+  "author": "DjokOne <tim@thefrenchmachine.fr>",
+  "main": "src/index.js",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/djokone/Vue-Helper-Forms"
+  },
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",

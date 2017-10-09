@@ -3,15 +3,14 @@ import tinymce from '@/tinymce'
 
 export default [
   {
-    name: 'prout',
-    grouped: false,
+    // name: 'prout',
+    grouped: true,
     type: 'groupe',
     class: 'cont6',
     inputs: [
       {
         label: 'Nom produit :',
         name: 'name',
-        value: 'coucou',
         // type: 'hidden',
         class: 'col4',
         placeholder: 'Doe'
@@ -32,7 +31,7 @@ export default [
   },
   {
     label: 'Catégories :',
-    name: 'slug',
+    name: 'category_id',
     default: 45,
     class: 'col3',
     options: {
@@ -98,6 +97,15 @@ export default [
   {
     label: 'Modèles',
     name: 'sousproduits',
+    title: function (vnode, input, value, key) {
+      // console.log(input)
+      // console.log(value)
+      return vnode('h2', {
+        domProps: {
+          innerHTML: value.name + '-' + value.ref
+        }
+      })
+    },
     btns: ['Supprimer'],
     forms: modelTable
   }
