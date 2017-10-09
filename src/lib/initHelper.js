@@ -1,11 +1,11 @@
-import { isEmpty, forEach } from 'lodash'
+import { forEach, cloneDeep } from 'lodash'
 
 const grouped = function (input) {
   let grouped
   if (typeof input.grouped === 'boolean') {
     if (!getName(input) && input.grouped) {
       grouped = false
-      console.log('Warning : Can\'t group because you\'ve got any name for the group')
+      console.warn('Can\'t group because you\'ve got any name for the group', input)
     } else {
       grouped = input.grouped
     }
@@ -36,7 +36,7 @@ const getDefaultValue = function (input, key = false) {
   } else if (input.forms) {
     data = fetchInputs(input.forms)
   } else if (input.value) {
-    data = input.value
+    data = cloneDeep(input.value)
   } else if (type === 'number') {
     data = 0
   } else if (type === 'checkbox') {
@@ -60,10 +60,7 @@ const getName = function (input, key = false) {
     name = input.name
   }
   if (input.name && typeof key === 'string') {
-    console.log('Warning: the name has been set twice, all before has been overwrited')
-  }
-  if (isEmpty(name)) {
-    name = false
+    console.warn('Warning: the name has been set twice, all before has been overwrited')
   }
   return name
 }
@@ -93,7 +90,7 @@ const fetchInputs = function (inputs) {
   forEach(inputs, (input, key) => {
     let name = getName(input, key)
     if (!name && (input.forms || input.inputs) && grouped(input)) {
-      console.log('Error: The input number ' + key + ' has no name !')
+      console.error('Error: The input number ' + key + ' has no name !')
     } else {
       let defaultValue = getDefaultValue(input)
       // console.log(name)
@@ -104,6 +101,8 @@ const fetchInputs = function (inputs) {
         forEach(defaultValue, (v, k) => {
           datas[k] = v
         })
+      } else if (getType(input) === 'btn') {
+        // Do nothing
       } else {
         datas[name] = defaultValue
       }
