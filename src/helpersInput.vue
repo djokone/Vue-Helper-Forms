@@ -1,5 +1,5 @@
 <script>
-  import { isEmpty, cloneDeep } from 'lodash'
+  import { isEmpty } from 'lodash'
   import inputDispatcher from '@/lib/InputUtils'
   // import tinymce from 'tinymce'
 
@@ -10,7 +10,7 @@
     data () {
       return {
         primary: this._uid,
-        localData: cloneDeep(this.value)
+        localData: this.value
       }
     },
     props: {
@@ -43,7 +43,7 @@
     },
     methods: {
       upLocal (val) {
-        this.localData = cloneDeep(val)
+        this.$set(this, 'localData', val)
       }
     },
     computed: {
@@ -80,6 +80,12 @@
         } else {
           return false
         }
+      }
+    },
+    watch: {
+      value (newVal) {
+        this.$set(this, 'localData', newVal)
+        // this.localData = cloneDeep(newVal)
       }
     },
     components: {

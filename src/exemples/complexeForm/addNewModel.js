@@ -1,13 +1,25 @@
 export default [
   {
-    type: 'groupe',
+    type: 'group',
     class: 'cont6',
     inputs: [
       {
-        label: 'Nom du modèle :',
-        name: 'name',
-        placeholder: 'Petit blender',
-        classes: 'col4'
+        type: 'group',
+        class: 'contRec',
+        inputs: [
+          {
+            type: 'group',
+            class: 'r',
+            inputs: [
+              {
+                label: 'Nom du modèle :',
+                name: 'name',
+                placeholder: 'Petit blender',
+                classes: 'col4'
+              }
+            ]
+          }
+        ]
       },
       {
         label: 'Référence :',
@@ -72,19 +84,40 @@ export default [
     type: 'btn'
   },
   {
-    name: 'testrecursive',
+    name: 'piecesDetache',
     forms: [
       {
-        name: 'prout'
+        name: 'name',
+        label: 'Nom pièce détaché :'
       },
       {
-        name: 'fesse'
+        name: 'ref',
+        label: 'Reference pièce'
       },
       {
         label: 'Ajouter',
         behavior: 'add',
         class: ['super'],
         type: 'btn'
+      },
+      {
+        name: 'pieces',
+        forms: [
+          {
+            name: 'name',
+            label: 'Nom piece : '
+          },
+          {
+            name: 'type',
+            label: 'Type de piece : '
+          },
+          {
+            label: 'Ajouter',
+            behavior: 'add',
+            class: ['super'],
+            type: 'btn'
+          }
+        ]
       },
       {
         label: 'Supprimer modèle',
@@ -96,14 +129,8 @@ export default [
   },
   {
     label: 'Supprimer',
-    behavior: ['add'],
+    behavior: ['del'],
     class: ['del'],
-    type: 'btn'
-  },
-  {
-    label: 'Sauvegarder',
-    behavior: 'edit',
-    class: ['edit'],
     type: 'btn'
   }
 ]
