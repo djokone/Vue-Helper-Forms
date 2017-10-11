@@ -7,6 +7,7 @@
       :inputs="inputs"
       class="test"
       :data="data"
+      @add="add"
     >
     </helperForm>
   </div>
@@ -43,13 +44,15 @@
     created () {
     },
     methods: {
-      add (success, error) {
+      add (success, error, event, change, parents) {
+        console.log(parents)
         success()
-      }
+      },
       // input (key, value, da) {
       // },
-      // update (data, newVal, childs) {
-      // }
+      update (data, newVal, childs) {
+        console.log(childs)
+      }
     },
     components: {
       helperForm
