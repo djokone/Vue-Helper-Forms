@@ -118,6 +118,8 @@ let createBtn = function (obj, create, input = obj) {
       event.preventDefault()
       obj.beforeUpButton(event, behavior)
     }
+  } else {
+    console.warn('Warn : A behavior is missing for your button, use {behavior: "add"} or {behavior: "del"} to sync your actions')
   }
   let btn = create('button', params)
   return btn

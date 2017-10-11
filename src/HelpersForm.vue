@@ -79,7 +79,6 @@
         // this.localData = cloneDeep(this.data)
       },
       upInput (key, value, childs = []) {
-        let newChild = []
         this.$set(this.localData, key, value)
         // this.localData[key] = value
         if (this.root) { // if is the last parent
@@ -87,30 +86,53 @@
           this.$emit('input', key, value, childs)
           this.$emit('updated', this.localData, false, false)
         } else {
-          newChild.push(this.name)
-          if (this.index !== false) {
-            newChild.push(this.index)
-          } else {
-            newChild.push('new')
-          }
-          if (isEmpty(childs)) {
-            childs = newChild
-          } else {
-            childs = [...newChild, ...childs]
-          }
+          childs = this.mergeParents(childs)
           // this.$off('input')
           this.$emit('upInput', key, value, this.index, childs)
           this.$emit('upForm', key, value, this.index, childs)
         }
       },
-      mergeParents (parents) {
+      /**
+       * Merge new parents into an array
+       *
+       * @param      {Array}  parents  The parents to merge
+       * @param      {Boolean}  wantRoot  To put root at the begining of the array
+       *
+       * return     {Array} An array of parents with the new parents
+       */
+      mergeParents (parents, wantRoot = false) {
+        let newParents = []
+        let name = this.name
+        if (!name && wantRoot) {
+          name = 'root'
+        }
+        if (name) {
+          newParents.push(name)
+        }
         if (this.index !== false) {
-          parents = [this.name, this.index, ...parents]
+          newParents.push(this.index)
+        } else if (this.new) {
+          newParents.push('new')
+        }
+        if (isEmpty(parents) && !isEmpty(newParents)) {
+          parents = newParents
         } else {
-          parents = [this.name, ...parents]
+          parents = [...newParents, ...parents]
         }
         return parents
       },
+
+      /**
+       * Back up the form event to the root when updates happen
+       *
+       * @param      {String}  key      The name of this input how changed
+       * @param      {String}  value    New value of this input
+       * @param      {Number}  index    Index of the instance
+       * @param      {Array}  parents   List of all the parents of the form
+       *
+       * @emits {update} emit update when it's root.
+       * @emits {upForm} emit upForm in all the parents inside the component.
+       */
       upForm (key, value, index, parents) {
         if (this.root) {
           let newVal = {}
@@ -118,7 +140,7 @@
             key,
             value
           }
-          this.$emit('updated', this.localData, newVal, parents)
+          this.$emit('update', this.localData, newVal, parents)
         } else {
           parents = this.mergeParents(parents)
           this.$emit('upForm', key, value, this.index, parents)
@@ -138,29 +160,26 @@
           callback()
         }
       },
-      beforeUpButton (event, behavior, change, parents, success = false, error = false) {
+      beforeUpButton (event, behavior, change, parents = [], success = false, error = false) {
         if (this.validate) {
           if (success === false && error === false) {
-            this.upButton(event, behavior, change, parents, this.btnSuccessCallback, this.btnErrorCallback)
+            this.upButton(event, behavior, this.localData, parents, this.btnSuccessCallback, this.btnErrorCallback)
           } else {
             this.$emit('upButton', event, behavior, change, parents, success, error)
           }
         } else {
+          //  send error
         }
       },
-      upButton (event, behavior, change = this.localData, parents = this.name, success, error, deepPropagation = -1) {
+      upButton (event, behavior, change = this.localData, parents = [], success, error, deepPropagation = -1) {
         let successCallback
         deepPropagation++
         let that = this
-        console.log(this.root)
-        console.log(deepPropagation)
-        if (deepPropagation === 0) {
+        parents = this.mergeParents(parents)
+        if (deepPropagation === 1) {
           if (behavior === 'add') {
-            console.log(parents)
-            console.log(this.name)
-            console.log(change)
             successCallback = function (callback) {
-              that.addLocalData(change, parents)
+              that.addLocalForm(change, parents)
               if (typeof callback === 'function') {
                 callback()
               }
@@ -169,39 +188,38 @@
           }
           if (behavior === 'del') {
             successCallback = function (callback) {
-              console.log(parents)
-              // that.delLocalData()
             }
           }
         }
+        let finalSuccess = success
+        if (typeof successCallback === 'function') {
+          finalSuccess = successCallback
+        }
         if (this.root) { // When the event is propagate until the root
-          console.log('is on rooot')
           if (Array.isArray(behavior)) {
             behavior = behavior[0]
           }
           if (this.hasToSendCallbackInside(behavior)) {
             if (this.validate) {
-              success()
+              finalSuccess()
             } else {
               error()
             }
           } else {
-            this.$emit(behavior, success, error, event, change, this.localData, parents)
+            this.$emit(behavior, finalSuccess, error, event, change, parents, this.localData)
           }
         } else {
-          if (typeof successCallback === 'function') {
-            this.$emit('upButton', event, behavior, change, parents, successCallback, error, deepPropagation)
-          }
-
-          this.$emit('upButton', event, behavior, change, parents, success, error, deepPropagation)
+          this.$emit('upButton', event, behavior, change, parents, finalSuccess, error, deepPropagation)
         }
       },
       resetForm () {
         let inputDefaultValue = fetchInputs(this.inputs)
         this.$set(this, 'localData', inputDefaultValue)
       },
-      addLocalData (data, parent) {
+      addLocalForm (data, parents) {
         let self = this
+        let parent = parents[2] // Take the last parent
+        if (parents.length <= 2) { parent = parents[0] }
         let localData = cloneDeep(data)
         if (!Array.isArray(self.localData[parent])) {
           self.$set(self.localData, parent, [localData])
