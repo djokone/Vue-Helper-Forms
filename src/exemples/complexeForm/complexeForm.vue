@@ -43,8 +43,9 @@
     created () {
     },
     methods: {
-      // add (event, data, local) {
-      // },
+      add (success, error) {
+        success()
+      }
       // input (key, value, da) {
       // },
       // update (data, newVal, childs) {

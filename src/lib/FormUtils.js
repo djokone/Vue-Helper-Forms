@@ -115,20 +115,8 @@ let createBtn = function (obj, create, input = obj) {
   params.on = []
   if (behavior) {
     params.on['click'] = function (event) {
-      obj.beforeUpButton()
       event.preventDefault()
-      obj.$emit('upButton', event, behavior, obj.localData, obj.name, 0,
-        function (res) {
-          if (!res['success']) {
-            console.log('error')
-          } else {
-            if (obj.new) {
-              obj.resetForm()
-            }
-            console.log('success')
-          }
-        }
-      )
+      obj.beforeUpButton(event, behavior)
     }
   }
   let btn = create('button', params)

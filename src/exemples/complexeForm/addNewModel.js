@@ -128,8 +128,8 @@ export default [
     ]
   },
   {
-    label: 'Supprimer',
-    behavior: ['del'],
+    label: 'Supprimer modele',
+    behavior: 'del',
     class: ['del'],
     type: 'btn'
   }

@@ -5,7 +5,7 @@
   // }
   import dispatchRoot from './lib/FormUtils'
   import { initData, fetchInputs, grouped, getName, getType } from './lib/initHelper'
-  import { isEmpty, cloneDeep } from 'lodash'
+  import { isEmpty, cloneDeep, find } from 'lodash'
 
   export default({
     name: 'helperForm',
@@ -14,7 +14,9 @@
     },
     data () {
       return {
-        localData: {}
+        localData: {},
+        success: true,
+        response: {}
       }
     },
     props: {
@@ -59,6 +61,15 @@
     },
     created () {
       this.downData()
+    },
+    computed: {
+      validate () {
+        if (this.error && !this.success) {
+          return false
+        } else {
+          return true
+        }
+      }
     },
     methods: {
       downData (data) {
@@ -113,39 +124,77 @@
           this.$emit('upForm', key, value, this.index, parents)
         }
       },
-      btnSuccessCallback () {
-
+      btnSuccessCallback (behavior, change, parents, callback) {
+        if (this.new) {
+          this.resetForm()
+        }
+        if (typeof callback === 'function') {
+          callback()
+        }
       },
-      btnErrorCallback () {
-
+      btnErrorCallback (behavior, change, parents, callback) {
+        if (typeof callback === 'function') {
+          console.log('error btn')
+          callback()
+        }
       },
-      beforeUpButton (event, behavior) {
-
+      beforeUpButton (event, behavior, change, parents, success = false, error = false) {
+        if (this.validate) {
+          if (success === false && error === false) {
+            this.upButton(event, behavior, change, parents, this.btnSuccessCallback, this.btnErrorCallback)
+          } else {
+            this.$emit('upButton', event, behavior, change, parents, success, error)
+          }
+        } else {
+        }
       },
-      upButton (event, behavior, change, parents, deepLevel = 0, res) {
-        let self = this
-        deepLevel = deepLevel + 1
-        event.preventDefault()
-        if (deepLevel === 1) {
+      upButton (event, behavior, change = this.localData, parents = this.name, success, error, deepPropagation = -1) {
+        let successCallback
+        deepPropagation++
+        let that = this
+        console.log(this.root)
+        console.log(deepPropagation)
+        if (deepPropagation === 0) {
           if (behavior === 'add') {
-            this.addLocalData(change, parents)
-            res(self.response())
-          } else if (behavior === 'del') {
-
+            console.log(parents)
+            console.log(this.name)
+            console.log(change)
+            successCallback = function (callback) {
+              that.addLocalData(change, parents)
+              if (typeof callback === 'function') {
+                callback()
+              }
+              success()
+            }
+          }
+          if (behavior === 'del') {
+            successCallback = function (callback) {
+              console.log(parents)
+              // that.delLocalData()
+            }
           }
         }
         if (this.root) { // When the event is propagate until the root
+          console.log('is on rooot')
           if (Array.isArray(behavior)) {
             behavior = behavior[0]
           }
-          // console.log(behavior)
-          this.$emit(behavior, event, change, this.localData, deepLevel)
+          if (this.hasToSendCallbackInside(behavior)) {
+            if (this.validate) {
+              success()
+            } else {
+              error()
+            }
+          } else {
+            this.$emit(behavior, success, error, event, change, this.localData, parents)
+          }
+        } else {
+          if (typeof successCallback === 'function') {
+            this.$emit('upButton', event, behavior, change, parents, successCallback, error, deepPropagation)
+          }
+
+          this.$emit('upButton', event, behavior, change, parents, success, error, deepPropagation)
         }
-      },
-      response () {
-        let res = {}
-        res['success'] = true
-        return res
       },
       resetForm () {
         let inputDefaultValue = fetchInputs(this.inputs)
@@ -166,6 +215,14 @@
         } else {
           return true
         }
+      },
+      hasToSendCallbackInside (behavior) {
+        if (Array.isArray(behavior)) {
+          behavior = behavior[0]
+        }
+        return isEmpty(find(this.$listeners, (v, k) => {
+          return k === behavior
+        }))
       },
       hasForms (input) {
         return typeof input.forms !== 'undefined'
