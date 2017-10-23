@@ -1,23 +1,18 @@
 <template>
   <div id="app">
-    <img src="./assets/logo-vue-helper-forms2.png" alt="">
+    <navigate>
+    </navigate>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import navigate from './components/nav'
+import './styles/app.sass'
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    navigate
+  }
 }
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

@@ -68,6 +68,7 @@ let generateFormInputs = function (obj, create, input) {
 }
 
 // Lunch the right function in a while
+// to make all it's chit working
 let dispatch = function (obj, create, input, key = false) {
   let toReturn = []
   if (obj.getType(input) === 'form') {
