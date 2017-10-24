@@ -71,25 +71,90 @@
         }
       }
     },
+    /**
+    *
+    * @function downData (data)
+    * @param {{foo: ?number, bar: string}} param - this is object param.
+    *
+    * @function downData (data)
+    * @function upInput (key, value, childs = [])
+    * @function mergeParents (parents, wantRoot = false)
+    * @function upForm (data)
+    * @function btnSuccessCallback (behavior, change, parents, callback)
+    * @function btnErrorCallback (behavior, change, parents, callback)
+    * @function beforeUpButton (event, behavior, change, parents = [], success = false, error = false)
+    *
+    *
+    */
     methods: {
+      /**
+      * Propagate the new data Props to the local state
+      *
+      * @param      {Object}  data    The data from props
+      */
       downData (data) {
         data = data || cloneDeep(this.data)
         this.$set(this, 'localData', data)
-        // this.localData = cloneDeep(this.data)
-        // this.localData = cloneDeep(this.data)
       },
-      upInput (key, value, childs = []) {
-        this.$set(this.localData, key, value)
+      upData (target, key, value) {
+        this.$set(target, key, value)
+      },
+      /**
+      * Propagate the new data Props to the local state
+      *
+      * @param      {Object}  data    The data from props
+      */
+      upDataInput (key, value, deep, childs = []) {
+        let target = this.localData
+        let that = this
+        let data = {}
+        data[key] = value
+        console.log(childs)
+        console.log(deep)
+        if (deep) {
+          childs.forEach((v, k) => {
+            // let prev = k - 1
+            // let next = k + 1
+            if (v === 'new' && !that.new) {
+              // target[.push(data)]
+            } else {
+              // console.log(value)
+              target = target[v]
+            }
+          })
+        } else {
+          // target = target[]
+        }
+        // console.log(target)
+        console.log('updateTarget')
+        console.log(target)
+        console.log(key)
+        console.log(value)
+        this.upData(target, key, value)
+      },
+      /**
+      * Propagate inputs events to the root
+      *
+      * @param      {Object}  data    The data from props
+      */
+      upInput (key, value, childs = [], deep = 0) {
+        this.$off('input')
+        childs = this.mergeParents(childs)
+        if (childs[childs.length - 1] !== 'new') {
+          this.upDataInput(key, value, deep, childs)
+        }
+        // this.$set(this.localData, key, value)
         // this.localData[key] = value
+        // console.log(childs)
+        // console.log(value)
+        // console.log(key)
         if (this.root) { // if is the last parent
-          // this.$off('input')
           this.$emit('input', key, value, childs)
           this.$emit('updated', this.localData, false, false)
         } else {
-          childs = this.mergeParents(childs)
           // this.$off('input')
-          this.$emit('upInput', key, value, this.index, childs)
-          this.$emit('upForm', key, value, this.index, childs)
+          this.$emit('upInput', key, value, childs, deep + 1)
+          this.$emit('upForm', key, value, childs)
         }
       },
       /**
@@ -121,7 +186,6 @@
         }
         return parents
       },
-
       /**
        * Back up the form event to the root when updates happen
        *
@@ -134,6 +198,11 @@
        * @emits {upForm} emit upForm in all the parents inside the component.
        */
       upForm (key, value, index, parents) {
+        // if (!this.new) {
+        //   // upData
+        // }
+        //
+        // console.log(this.localData)
         if (this.root) {
           let newVal = {}
           newVal = {
@@ -146,6 +215,16 @@
           this.$emit('upForm', key, value, this.index, parents)
         }
       },
+      /**
+       * Callback lunched with success() in the listening behavior function
+       * Will do the right success mutations inside the local state
+       *
+       * @param      {String}    behavior  The behavior
+       * @param      {Object}    change    Just what's changed
+       * @param      {Array}    parents    All the parents in the array
+       * @param      {Function}  callback  The callback to do next
+       *
+       */
       btnSuccessCallback (behavior, change, parents, callback) {
         if (this.new) {
           this.resetForm()
@@ -154,6 +233,15 @@
           callback()
         }
       },
+      /**
+       * Callback lunched with error() in the listening behavior function
+       * Will do the right success mutations inside the local state
+       *
+       * @param      {String}    behavior  The behavior
+       * @param      {Object}    change    Just what's changed
+       * @param      {Array}    parents    All the parents in the array
+       * @param      {Function}  callback  The callback to do next
+       */
       btnErrorCallback (behavior, change, parents, callback) {
         if (typeof callback === 'function') {
           console.log('error btn')
@@ -171,24 +259,43 @@
           //  send error
         }
       },
-      upButton (event, behavior, change = this.localData, parents = [], success, error, deepPropagation = -1) {
+
+      /**
+       * Back up button event
+       *
+       * @param      {Object}    event            The event javascript object
+       * @param      {String}    behavior         The behavior attach to the event
+       * @param      {Object}    change           The change in the form l
+       * @param      {Array}     parents          Go to the merge function to add all tne new
+       *                                          parents during the propagation
+       * @param      {Function}  success          The succes to lunch if it's all good
+       * @param      {Function}  error            The error to lunch when trouble happen
+       * @param      {Number}    deepPropagation  The deep propagation
+       * @param      {boolean}   parentLocalData  The parent local data
+       *
+       * @emits {update} emit update when it's root.
+       * @emits {upForm} emit upForm in all the parents inside the component.
+       *
+       */
+      upButton (event, behavior, change = this.localData, parents = [], success, error, deepPropagation = -1, parentLocalData = false) {
         let successCallback
         deepPropagation++
         let that = this
+        console.log(this.localData)
         parents = this.mergeParents(parents)
-        if (deepPropagation === 1) {
-          if (behavior === 'add') {
-            successCallback = function (callback) {
-              that.addLocalForm(change, parents)
-              if (typeof callback === 'function') {
-                callback()
-              }
-              success()
+        if (behavior === 'add') {
+          successCallback = function (callback) {
+            that.addLocalForm(change, parents, deepPropagation, parentLocalData)
+            if (typeof callback === 'function') {
+              callback()
             }
+            success()
           }
-          if (behavior === 'del') {
-            successCallback = function (callback) {
-            }
+        }
+        if (behavior === 'del') {
+          successCallback = function (callback) {
+            that.removeLocalForm(change, parents, deepPropagation)
+            success()
           }
         }
         let finalSuccess = success
@@ -209,23 +316,46 @@
             this.$emit(behavior, finalSuccess, error, event, change, parents, this.localData)
           }
         } else {
-          this.$emit('upButton', event, behavior, change, parents, finalSuccess, error, deepPropagation)
+          this.$emit('upButton', event, behavior, change, parents, finalSuccess, error, deepPropagation, this.localData)
+        }
+      },
+      upDataForm (data, child) {
+        let localData = cloneDeep(data)
+        if (!Array.isArray(this.localData[child])) {
+          this.$set(this.localData, child, [localData])
+        } else {
+          this.localData[child].push(localData)
         }
       },
       resetForm () {
         let inputDefaultValue = fetchInputs(this.inputs)
         this.$set(this, 'localData', inputDefaultValue)
       },
-      addLocalForm (data, parents) {
-        let self = this
-        let parent = parents[2] // Take the last parent
-        if (parents.length <= 2) { parent = parents[0] }
-        let localData = cloneDeep(data)
-        if (!Array.isArray(self.localData[parent])) {
-          self.$set(self.localData, parent, [localData])
-        } else {
-          self.localData[parent].push(localData)
+      addLocalForm (change, parents, actualDeep = false, parent = false) {
+        console.log(this.new)
+        if (actualDeep === 1 && !this.new) {
+          console.log(actualDeep)
+          this.upAddLocalDataForm(change, parents, actualDeep, parent)
         }
+      },
+      upAddLocalDataForm (change, parents, actualDeep = false, parent = false) {
+        let child = parents[2] // Take the last parent
+        // let last = parents[parents.length - 1]
+        // let rootCall = false
+        if (parents.length < 2) { child = parents[0] }
+        if (parent !== false) {
+          change = cloneDeep(parent)
+        }
+        console.log(change)
+        this.upDataForm(change, child)
+      },
+      removeLocalForm (data, parents, actualDeep) {
+        let last = parents[parents.length - 1]
+        if (last === 'new') {
+          console.warn('Can\'t remove a form how\'s not created, not suppose to happen !')
+        }
+        console.log(parents)
+        console.log(data)
       },
       haveNew (input) {
         if (input.new) {

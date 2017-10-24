@@ -178,6 +178,7 @@ let createHelperForm = function (obj, create, input, key = false) {
   }
   // on['input'] = obj.upInput
   on['upForm'] = obj.upForm
+  on['upInput'] = obj.upInput
   on['upButton'] = obj.upButton
   if (!obj.name) {
     props['parent'] = 'root'

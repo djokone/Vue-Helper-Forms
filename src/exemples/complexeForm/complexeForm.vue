@@ -46,13 +46,13 @@
     },
     methods: {
       add (success, error, event, change, parents) {
-        console.log(parents)
+        // console.log(parents)
         success()
       },
       // input (key, value, da) {
       // },
       update (data, newVal, childs) {
-        console.log(childs)
+        // console.log(childs)
       }
     },
     components: {
