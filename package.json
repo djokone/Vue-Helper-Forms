@@ -1,9 +1,9 @@
 {
   "name": "vue-helper-forms",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Helper for vue js to create awsome forms",
   "author": "DjokOne <tim@thefrenchmachine.fr>",
-  "main": "src/index.js",
+  "main": "dist/js/app.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/djokone/Vue-Helper-Forms"
