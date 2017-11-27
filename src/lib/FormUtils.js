@@ -68,6 +68,7 @@ let generateFormInputs = function (obj, create, input) {
 }
 
 // Lunch the right function in a while
+// to make all it's chit working
 let dispatch = function (obj, create, input, key = false) {
   let toReturn = []
   if (obj.getType(input) === 'form') {
@@ -115,21 +116,11 @@ let createBtn = function (obj, create, input = obj) {
   params.on = []
   if (behavior) {
     params.on['click'] = function (event) {
-      obj.beforeUpButton()
       event.preventDefault()
-      obj.$emit('upButton', event, behavior, obj.localData, obj.name, 0,
-        function (res) {
-          if (!res['success']) {
-            console.log('error')
-          } else {
-            if (obj.new) {
-              obj.resetForm()
-            }
-            console.log('success')
-          }
-        }
-      )
+      obj.beforeUpButton(event, behavior)
     }
+  } else {
+    console.warn('Warn : A behavior is missing for your button, use {behavior: "add"} or {behavior: "del"} to sync your actions')
   }
   let btn = create('button', params)
   return btn
@@ -187,6 +178,7 @@ let createHelperForm = function (obj, create, input, key = false) {
   }
   // on['input'] = obj.upInput
   on['upForm'] = obj.upForm
+  on['upInput'] = obj.upInput
   on['upButton'] = obj.upButton
   if (!obj.name) {
     props['parent'] = 'root'

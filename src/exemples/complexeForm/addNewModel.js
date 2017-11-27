@@ -85,6 +85,13 @@ export default [
   },
   {
     name: 'piecesDetache',
+    title: function (vnode, input, value) {
+      return vnode('h3', {
+        domProps: {
+          innerHTML: value.name + ' - ' + value.ref
+        }
+      })
+    },
     forms: [
       {
         name: 'name',
@@ -102,6 +109,13 @@ export default [
       },
       {
         name: 'pieces',
+        title: function (vnode, input, value) {
+          return vnode('h4', {
+            domProps: {
+              innerHTML: value.name + ' - ' + value.type
+            }
+          })
+        },
         forms: [
           {
             name: 'name',
@@ -120,7 +134,7 @@ export default [
         ]
       },
       {
-        label: 'Supprimer modèle',
+        label: 'Supprimer piece detaché',
         behavior: 'del',
         class: ['super'],
         type: 'btn'
@@ -128,8 +142,8 @@ export default [
     ]
   },
   {
-    label: 'Supprimer',
-    behavior: ['del'],
+    label: 'Supprimer modele',
+    behavior: 'del',
     class: ['del'],
     type: 'btn'
   }

@@ -19,3 +19,7 @@ selenium-debug.log
 *.ntvs*
 *.njsproj
 *.sln
+
+Vue-helper-Form\.sublime-workspace
+
+Vue-helper-Form\.sublime-project
