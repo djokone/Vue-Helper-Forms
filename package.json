@@ -1,6 +1,6 @@
 {
   "name": "vue-helper-forms",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Helper for vue js to create awsome forms",
   "author": "DjokOne <tim@thefrenchmachine.fr>",
   "main": "dist/js/app.js",
